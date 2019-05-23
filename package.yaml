@@ -24,6 +24,9 @@ dependencies:
 - parsec
 - containers
 - hspec
+- pretty-simple
+- haskeline
+- mtl
 
 library:
   source-dirs: src
