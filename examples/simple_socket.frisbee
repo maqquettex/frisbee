@@ -1,0 +1,53 @@
+from socket import Socket, Connection;
+import string;
+import list;
+import io;
+
+
+active Client() {
+    Client(Connection conn) {
+        this.conn = conn;  # Link to actor holding connection
+        this.values = [];
+    }
+    
+    run() {
+        val data <= this.conn ! receive();
+        val data_splitted = string.split(data, ';');
+        
+        val operation = data_splitted[0];
+
+        if (operation == 'get') {
+            this.conn ! send('Get');
+        }
+        else if (operation == 'put') {
+            this.conn ! send('Put');
+        }
+
+        else if (operation == 'exit') {
+            # Finishing connection
+            _ <= this.conn ! close();  # Close connection
+            
+            # Forgeting link to actor forces GC to collect it
+            forget this.conn;
+            break;
+        }
+    }
+}
+
+
+active Main() {
+    run() {
+        Socket socket = spawn Socket();
+        # Also possible: val socket = spawn Socket();
+        
+        io.print('Starting server!');
+        while (true) {
+            # Local actor -> call message and wait for response
+            val conn <= this.socket ! accept(this);
+
+            io.print("New client connected");
+            val new_client = spawn Client(conn);
+            new_client ! run();
+        }
+    }
+}
