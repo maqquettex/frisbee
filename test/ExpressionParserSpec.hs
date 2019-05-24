@@ -78,7 +78,7 @@ spec = do
       "(x()[1]) [5]" `shouldParseTo` (subscr (subscr (Call (Variable "x") []) 1) 5)
       "(x())[1][5]" `shouldParseTo` (subscr (subscr (Call (Variable "x") []) 1) 5)
 
-    it "REALLT A LOT of chained subscriprions and calls" $ do
+    it "REALLY A LOT of chained subscriprions and calls" $ do
       let sub expr = (subscr expr 0)
       let call expr = (Call expr [])
       let chain = sub . call . sub . call . sub . call . sub

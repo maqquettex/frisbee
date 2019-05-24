@@ -43,13 +43,14 @@ stringExpr = (Value . String) <$> stringLiteral
 -- Variables
 variableExpr = Variable <$> identifier
 
-atomicExpr =  trySeveral [ doubleExpr
-                         , integerExpr
-                         , trueExpr
-                         , falseExpr
-                         , nullExpr
-                         , stringExpr
-                         , variableExpr ]
+valueExpr = trySeveral [ doubleExpr
+                       , integerExpr
+                       , trueExpr
+                       , falseExpr
+                       , nullExpr
+                       , stringExpr ]
+
+atomicExpr =  trySeveral [ valueExpr, variableExpr ]
 
 -- ##########################
 -- ### SIMPLE EXPRESSIONS ###
@@ -158,6 +159,20 @@ whileOnlyExpr = trySeveral [breakExpr, continueExpr]
 
 flowExpr = trySeveral [ ifExpr, whileExpr ]
 
+
+activeObjectExpr = do
+    reserved "active"
+    name <- identifier
+    expression <- braces $ objectDefinitionExpr
+    return $ ActiveDef name (Expression expression)
+
+objectDefinitionExpr = do
+    let fieldDef = reserved "val" >> identifier
+    definitions = 
+
+    
+
+
 -- ############################
 -- ### TOPLEVEL EXPRESSIONS ###
 -- ############################
@@ -169,7 +184,8 @@ endsWithBlock _                             = False
 
 -- General parser to check all expressions available on top-level
 simpleStmt = Expression <$> expression
-statement = trySeveral [flowExpr, simpleStmt]
+-- statement = trySeveral [flowExpr, simpleStmt]
+statement = activeObjectExpr
 
 -- Parser modificator that ensures what expressions should end with semicolon on top-level
 ensureSemi :: Parser Statement -> Parser Statement

@@ -14,7 +14,9 @@ data Value = Integer Integer
 
 data Expression = Value Value
                 | Variable String  -- name of variable
+                
                 | Call Expression [Expression]  -- Callable and arguments
+
                 | ArrayDeclare [Expression]
 
                 -- Operators and array subscription
@@ -24,12 +26,13 @@ data Expression = Value Value
 
                 deriving (Show, Ord, Eq)
 
-
 data Statement = Expression Expression
                | Assign String Expression
                | While Expression [Statement]
                | If Expression [Statement] (Maybe [Statement])
 
+               | ActiveObjectDef String [String] Statement
+               | PassiveObjectDef String [String] Statement
                -- While loop body only
                | Continue
                | Break

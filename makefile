@@ -3,4 +3,4 @@ all:
 	stack exec frisbee-exe
 
 tests:
-	timeout 5 stack test --fast
+	timeout 15 stack test --fast
