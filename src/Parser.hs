@@ -40,12 +40,6 @@ nullExpr = reserved "null" >> (return $ Value Null)
 -- Strings
 stringExpr = (Value . String) <$> stringLiteral
 
--- Built-in functions
-printExpr = reserved "print" >> (return $ Value $ BuiltinFunction Print)
-isNullExpr = reserved "isnull" >> (return $ Value $ BuiltinFunction IsNull)
-lengthExpr = reserved "length" >> (return $ Value $ BuiltinFunction Length)
-builtinFunctionExpr = trySeveral [printExpr, isNullExpr, lengthExpr]
-
 -- Variables
 variableExpr = Variable <$> identifier
 
@@ -55,7 +49,6 @@ atomicExpr =  trySeveral [ doubleExpr
                          , falseExpr
                          , nullExpr
                          , stringExpr
-                         , builtinFunctionExpr
                          , variableExpr ]
 
 -- ##########################
@@ -91,8 +84,7 @@ operatorExpr = Ex.buildExpressionParser operatorsTable operandExpr
 
 -- Everything that possible could be used in operators: everything but not function or assign
 -- Helper for `operatorExpr` parser
-operandExpr' =  (trySeveral [ lambdaExprCall
-                           , variableExprCall
+operandExpr' =  (trySeveral [ variableExprCall
                            , atomicExpr
                            , arrayExpr
                            , (parens operatorExpr) ])
@@ -123,31 +115,11 @@ withNext parser = do
     _             -> parser
 
 -- Call expressions
-lambdaExprCall = withNextCalls (parens functionExpr)
 variableExprCall = withNextCalls variableExpr
 
-assignExpr = do
-  var <- identifier
-  reservedOp "="
-  someExpr <- expression
-  return $ Assign var someExpr
 
--- Always starts new scope, so, not bool params required
-functionExpr = do
-  reserved "function"
-  selfRef <- optionMaybe identifier
-  args    <- parens $ commaSep identifier
-  body    <- (blockExpr True False)
-
-  -- Do not allow lambda calls without parentheses (function {} () ())
-  -- (function () {}) () should be used
-  notFollowedBy $ (parens $ commaSep identifier)
-  return $ Function selfRef args body
-
-callableExpr' =  trySeveral [ lambdaExprCall
-                            , functionExpr
-                            , variableExpr
-                            , builtinFunctionExpr
+callableExpr' =  trySeveral [ 
+                              variableExpr
                             , (parens callableExpr') ]
 
 nonCallableExpr' =  trySeveral [ operatorExpr
@@ -163,39 +135,28 @@ expression = withNext (trySeveral [nonCallableExpr', callableExpr'])
 -- ### FLOW EXPRESSIONS ###
 -- ########################
 
-ifExpr withinFunc withinWhile = do
-  let elseParser = (reserved "else" >> (blockExpr withinFunc withinWhile))
+ifExpr = do
+  let elseParser = (reserved "else" >> blockExpr)
 
   reserved "if"
   conditional <- parens expression
-  trueBranch  <- (blockExpr withinFunc withinWhile)
+  trueBranch  <- blockExpr
   falseBranch <- optionMaybe elseParser
   return $ If conditional trueBranch falseBranch
 
-whileExpr withinFunc = do
+whileExpr = do
   reserved "while"
   conditional <- parens expression
-  body        <- (blockExpr withinFunc True)
+  body        <- blockExpr
   return $ While conditional body
 
 
-returnExpr = reserved "return" >> (Return <$> (optionMaybe expression))
-funcOnlyExpr = trySeveral [returnExpr]
 
 continueExpr = reserved "continue" >> return Continue
 breakExpr    = reserved "break"    >> return Break
 whileOnlyExpr = trySeveral [breakExpr, continueExpr]
 
-flowExpr' wFunc wWhile =  trySeveral [ (ifExpr wFunc wWhile)
-                                     , (whileExpr wFunc)
-                                     , assignExpr ]
-
-flowExpr :: Bool -> Bool -> Parser Statement
-flowExpr False False = flowExpr' False False
-flowExpr True False  = trySeveral [funcOnlyExpr, (flowExpr' True False)]
-flowExpr False True  = trySeveral [whileOnlyExpr, (flowExpr' False True)]
-flowExpr True True   = trySeveral [funcOnlyExpr, whileOnlyExpr, (flowExpr' True True)]
-
+flowExpr = trySeveral [ ifExpr, whileExpr ]
 
 -- ############################
 -- ### TOPLEVEL EXPRESSIONS ###
@@ -204,29 +165,26 @@ flowExpr True True   = trySeveral [funcOnlyExpr, whileOnlyExpr, (flowExpr' True 
 endsWithBlock :: Statement -> Bool
 endsWithBlock (While _ _)                   = True
 endsWithBlock (If _ _ _)                    = True
-endsWithBlock (Expression (Function _ _ _)) = True
 endsWithBlock _                             = False
 
 -- General parser to check all expressions available on top-level
 simpleStmt = Expression <$> expression
-statement wFunc wWhile = trySeveral [(flowExpr wFunc wWhile), simpleStmt]
+statement = trySeveral [flowExpr, simpleStmt]
 
 -- Parser modificator that ensures what expressions should end with semicolon on top-level
 ensureSemi :: Parser Statement -> Parser Statement
 ensureSemi exprParser = do
   newExpr <- exprParser
-  case newExpr of
-    (endsWithBlock -> True) -> return newExpr
-    _                       -> (reservedOp ";" >> return newExpr)
+  (reservedOp ";" >> return newExpr)
 
 -- Parses many expressions of given parser with correct semicolons
 toplevelProducer :: Parser Statement -> Parser [Statement]
 toplevelProducer = many . ensureSemi
 
 -- Blocks ( { } ) parsers for given allowed expressions
-blockExpr wFunc wWhile =
-  trySeveral [ (braces $ toplevelProducer (statement wFunc wWhile))
-             , (blockExprAsSingle $ ensureSemi (statement wFunc wWhile)) ]
+blockExpr =
+  trySeveral [ (braces $ toplevelProducer statement)
+             , (blockExprAsSingle $ ensureSemi statement) ]
 
 -- Helper function to allow single expression as block
 blockExprAsSingle :: Parser Statement -> Parser [Statement]
@@ -242,7 +200,7 @@ contents p = do
 
 -- Parse given string or return an error
 parseToplevel :: String -> Either Parser.ParseError [Statement]
-parseToplevel s = parse (contents $ toplevelProducer (statement False False)) "<stdin>" s
+parseToplevel s = parse (contents $ toplevelProducer statement) "<stdin>" s
 
 
 -- ### ERROR-RELATED FUNCTIONS ###

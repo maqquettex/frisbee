@@ -4,7 +4,6 @@ import Text.Pretty.Simple (pPrint)
 
 import Syntax
 import Parser
-import Evaluation
 import Environment
 
 
@@ -16,8 +15,8 @@ parse line = do
     Right ex -> return ex
 
 
-startInterpreter :: (Maybe Env) -> [Statement] -> IO (Env)
-startInterpreter Nothing es = startInterpreter (Just emptyEnv) es
-startInterpreter (Just env) exprs = do
-   (newEnv, _) <- runExpressions env False Nothing exprs
-   return newEnv
+-- startInterpreter :: (Maybe Env) -> [Statement] -> IO (Env)
+-- startInterpreter Nothing es = startInterpreter (Just emptyEnv) es
+-- startInterpreter (Just env) exprs = do
+--    (newEnv, _) <- runExpressions env False Nothing exprs
+--    return newEnv

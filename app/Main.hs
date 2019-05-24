@@ -52,8 +52,7 @@ parseFileAST file = do
 processLine :: String -> Maybe Env -> IO(Maybe Env)
 processLine line env = do
   exprs  <- parse line
-  newEnv <- startInterpreter env exprs
-  return (Just newEnv)
+  return Nothing
 
 
 runREPL :: IO ()
@@ -70,6 +69,6 @@ parseFile file = do
   program  <- readFile file
   exprs    <- parse program
   putStrLn ("----- Running " ++ file ++ " -----")
-  _        <- startInterpreter Nothing exprs
+--   _        <- startInterpreter Nothing exprs
   putStrLn ("---------- END ----------")
 

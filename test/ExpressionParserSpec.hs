@@ -27,60 +27,22 @@ spec :: Spec
 spec = do
   describe "process" $ do
 
-    it "`isnull` parses as builtin function" $ do
-      "isnull" `shouldParseTo` (Value (BuiltinFunction IsNull))
-      "isnull(x)" `shouldParseTo` (Call (Value (BuiltinFunction IsNull)) [Variable "x"])
-
-    it "`print` parses as builtin function" $ do
-      "print(\"hello\", 1)" `shouldParseTo` (Call (Value (BuiltinFunction Print))
-                                                  [Value (String "hello"), Value (Integer 1)])
-
-    it "Function name is optional" $ do
-      "function() {}" `shouldParseTo` (Function Nothing [] [])
-      "function foo() {}" `shouldParseTo` (Function (Just "foo") [] [])
-
     it "Call could be right operand of operator" $ do
       "1 + some()" `shouldParseTo` (BinaryOp Plus
                                              (Value $ Integer 1)
                                              (Call (Variable "some") []))
-
-    it "Lambda-call could be right operand of operator" $ do
-      "1 + (function () {})()" `shouldParseTo` (BinaryOp Plus
-                                                         (Value $ Integer 1)
-                                                         (Call (Function Nothing [] []) []))
-
     it "Call could be left operand of operator" $ do
       "some() + 1" `shouldParseTo` (BinaryOp Plus
                                              (Call (Variable "some") [])
                                              (Value $ Integer 1))
 
-    it "Lambda-call could be left operand of operator" $ do
-      "(function () {})() / 1" `shouldParseTo` (BinaryOp Divide
-                                                         (Call (Function Nothing [] []) [])
-                                                         (Value $ Integer 1))
-
     it "Call could be left operand of unary operators" $ do
       "not foo()" `shouldParseTo` (UnaryOp Not (Call (Variable "foo") []))
       "- foo()" `shouldParseTo` (UnaryOp Negate (Call (Variable "foo") []))
 
-    it "Lambda-call could be left operand of unary operators" $ do
-      "not (function () {})()" `shouldParseTo` (UnaryOp Not (Call (Function Nothing [] []) []))
-      "- (function () {})()" `shouldParseTo` (UnaryOp Negate (Call (Function Nothing [] []) []))
-
-    it "Lambda-call allowed only in parentheses" $ do
-      "(function () {}) ()  ()" `shouldParseTo` (Call (Call (Function Nothing [] []) []) [])
-      shouldFail "function () {} ();"
-
     let array = ArrayDeclare :: [Expression] -> Expression
     let subscr expr num = Subscript expr (Value (Integer num))
-    it "Simple array expressions" $ do
-      "[]" `shouldParseTo` (array [])
-      "[1]" `shouldParseTo` (array [(Value $ Integer 1)])
-      "[x, print]" `shouldParseTo` (array [ (Variable "x")
-                                          , (Value $ BuiltinFunction Print)])
-
-      shouldFail "[x, print, ]"  -- TRAILING COMMAS GOODBYE
-
+   
     it "Array with call and as call argument" $ do
       "[x(), y([4.2, null])]" `shouldParseTo` array [ (Call (Variable "x") [])
                                                     , (Call (Variable "y")
@@ -94,8 +56,7 @@ spec = do
       "[] + [2]" `shouldParseTo` (BinaryOp Plus (array []) (array [(Value $ Integer 2)]))
       "x() + []" `shouldParseTo` (BinaryOp Plus (Call (Variable "x") [])
                                                 (array []))
-      "[print] + x()" `shouldParseTo` (BinaryOp Plus (array [Value $ BuiltinFunction Print])
-                                                     (Call (Variable "x") []))
+     
 
     it "Array subscription" $ do
       "[1, 2][0]" `shouldParseTo` (subscr (array [ (Value $ Integer 1)

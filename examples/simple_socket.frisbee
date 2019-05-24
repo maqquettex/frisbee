@@ -10,7 +10,7 @@ active Client() {
         this.values = [];
     }
     
-    run() {
+    void run() {
         val data <= this.conn ! receive();
         val data_splitted = string.split(data, ';');
         
