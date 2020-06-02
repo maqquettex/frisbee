@@ -1,4 +1,5 @@
 use strum_macros::EnumIter;
+#[allow(unused_imports)]
 use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug, PartialEq, EnumIter)]
