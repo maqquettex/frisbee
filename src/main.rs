@@ -1,10 +1,13 @@
 pub mod vm;
 pub mod instruction;
+pub mod assembler;
+pub mod parser_core;
 pub mod parser;
+
+use crate::parser::load_instr;
 
 use std::env;
 use std::fs;
-use parser::load_instuction;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -21,7 +24,7 @@ fn main() {
 
 
     lines.for_each(|line| {
-        let res = load_instuction(line).unwrap().1;
+        let res = crate::load_instr(line).unwrap().1;
         println!("{:?}", res);
     });
 }

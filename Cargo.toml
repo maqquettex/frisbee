@@ -1,5 +1,5 @@
 [package]
-name = "iridium"
+name = "frisbee"
 version = "0.1.0"
 authors = ["Anton Zhdan-Pushkin <maqquettex@gmail.com>"]
 edition = "2018"
