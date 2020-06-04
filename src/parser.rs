@@ -1,5 +1,5 @@
 extern crate nom;
-use crate::assembler::{AssemblerInstruction, Operand};
+use crate::assembler::{AssemblerInstruction};
 use crate::parser_core::{register, int_value};
 use crate::instruction::Opcode;
 
@@ -26,6 +26,7 @@ crate::named_ternary!(gt_instr, Opcode::GT, "gt", register, register, register);
 crate::named_ternary!(lt_instr, Opcode::LT, "lt", register, register, register);
 crate::named_binary!(jeq_instr, Opcode::JEQ, "jeq", register, register);
 crate::named_binary!(jneq_instr, Opcode::JNEQ, "jneq", register, register);
+crate::named_unary!(prnt_instr, Opcode::PRNT, "prnt", register);
 
 
 named!(pub parse<&str, AssemblerInstruction>,
@@ -44,6 +45,7 @@ named!(pub parse<&str, AssemblerInstruction>,
     | lt_instr
     | jeq_instr
     | jneq_instr
+    | prnt_instr
   )
 );
 

@@ -1,0 +1,10 @@
+load %01 #133
+load %02 #1
+load %04 #36
+load %05 #18
+load %06 #2
+gt %02 %01 %03
+jeq %03 %04
+mul %06 %02 %02
+jmpb %05
+prnt %02

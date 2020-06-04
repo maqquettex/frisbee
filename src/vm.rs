@@ -3,7 +3,7 @@ use crate::instruction::Opcode;
 pub struct VM {
   registers: [i32; 32],
   pc: usize,
-  program: Vec<u8>,
+  pub program: Vec<u8>,
   remainder: i32,
 }
 
@@ -58,9 +58,7 @@ impl VM {
             let number = self.next_16_bits() as u32;
             self.registers[register] = number as i32;
         },
-        Opcode::HLT => {
-            println!("HLT encountered");
-        },
+        Opcode::HLT => {},
         Opcode::ADD => {
           let register1 = self.registers[self.next_8_bits() as usize];
           let register2 = self.registers[self.next_8_bits() as usize];
@@ -148,6 +146,10 @@ impl VM {
               self.pc = target as usize;
           }
         },
+        Opcode::PRNT => {
+          let value = self.registers[self.next_8_bits() as usize];
+          println!("OUT: {}", value);
+        }
         _ => {
             println!("Unknown opcode");
             return true;

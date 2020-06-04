@@ -5,10 +5,11 @@ use nom::{
   IResult,
   named,
   tag,
+  opt,
   do_parse,
   bytes::complete::{tag, take_while_m_n,},
   character::complete::digit1,
-  combinator::map_res
+  combinator::map_res,
 };
 
 
@@ -56,8 +57,12 @@ macro_rules! named_ternary {
 named!(pub int_value<&str, Operand>,
     do_parse!(
         tag!("#") >>
+        minus: opt!(tag!("-")) >>
         reg_num: digit1 >>
-        (Operand::IntegerValue(reg_num.parse::<i32>().unwrap()))
+        ({
+          let val = reg_num.parse::<i32>().unwrap() * minus.map_or(1, |_| -1);
+          Operand::IntegerValue(val)
+        })
     )
 );
 
@@ -112,5 +117,4 @@ mod tests {
     assert!(int_value("#FF").is_err());
     assert!(int_value("100").is_err());
   }
-
 }

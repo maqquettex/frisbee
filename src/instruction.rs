@@ -19,6 +19,7 @@ pub enum Opcode {
   LT = 0xC,
   JEQ = 0xD,
   JNEQ = 0xE,
+  PRNT = 0xF,
   IGL = 0xFF,
 }
 
@@ -59,6 +60,7 @@ impl From<u8> for Opcode {
         0xC => Opcode::LT,
         0xD => Opcode::JEQ,
         0xE => Opcode::JNEQ,
+        0xF => Opcode::PRNT,
         _ => Opcode::IGL,
       }
   }
