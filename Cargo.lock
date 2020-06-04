@@ -19,21 +19,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
+name = "frisbee"
+version = "0.1.0"
+dependencies = [
+ "nom",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "heck"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20564e78d53d2bb135c343b3f47714a56af2061f1c928fdb541dc7b9fdd94205"
 dependencies = [
  "unicode-segmentation",
-]
-
-[[package]]
-name = "iridium"
-version = "0.1.0"
-dependencies = [
- "nom",
- "strum",
- "strum_macros",
 ]
 
 [[package]]

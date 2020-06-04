@@ -38,6 +38,7 @@ macro_rules! named_binary {
   );
 }
 
+#[macro_export]
 macro_rules! named_ternary {
   ($name: ident, $opc: expr, $tag: expr, $op1_p: ident, $op2_p: ident, $op3_p: ident) => (
     named!(pub $name<&str, AssemblerInstruction>, 

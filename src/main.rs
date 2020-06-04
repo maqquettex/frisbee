@@ -4,7 +4,8 @@ pub mod assembler;
 pub mod parser_core;
 pub mod parser;
 
-use crate::parser::load_instr;
+use crate::parser::parse;
+use crate::assembler::AssemblerInstruction;
 
 use std::env;
 use std::fs;
@@ -20,11 +21,19 @@ fn main() {
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file {}");
 
-    let lines = contents.split("\n").filter(|x| x != &"\n" && x.len() != 0);
+    let lines = contents.split("\n");
 
+    let mut program: Vec<AssemblerInstruction> = vec![];
 
-    lines.for_each(|line| {
-        let res = crate::load_instr(line).unwrap().1;
-        println!("{:?}", res);
-    });
+    for (i, line) in lines.enumerate() {
+        if line == "\n" || line.len() == 0 {
+            continue;
+        }
+
+        match parse(line) {
+            Ok((_, asmi)) => program.push(asmi),
+            Err(_) => println!("Error on line {} ", i+1) // enumerate starts from 0
+        }
+    }
+
 }

@@ -190,7 +190,7 @@ mod tests {
   #[test]
   fn test_load_opcode() {
     let mut test_vm = VM::new();
-    test_vm.program = vec![Opcode::LOAD as u8, 0, 1, 244]; // Remember, this is how we represent 500 using two u8s in little endian format
+    test_vm.program = vec![Opcode::LOAD as u8, 0, 1, 244];
     test_vm.run_once();
     assert_eq!(test_vm.registers[0], 500);
   }
@@ -200,7 +200,7 @@ mod tests {
     let mut test_vm = VM::new();
     test_vm.registers[0] = 2;
     test_vm.registers[1] = 3;
-    test_vm.program = vec![Opcode::ADD as u8, 0, 1, 3]; // Remember, this is how we represent 500 using two u8s in little endian format
+    test_vm.program = vec![Opcode::ADD as u8, 0, 1, 3];
     test_vm.run_once();
     assert_eq!(test_vm.registers[3], 5);
   }
@@ -210,7 +210,7 @@ mod tests {
     let mut test_vm = VM::new();
     test_vm.registers[0] = 2;
     test_vm.registers[1] = 3;
-    test_vm.program = vec![Opcode::SUB as u8, 0, 1, 2]; // Remember, this is how we represent 500 using two u8s in little endian format
+    test_vm.program = vec![Opcode::SUB as u8, 0, 1, 2];
     test_vm.run_once();
     assert_eq!(test_vm.registers[2], -1);
   }
@@ -220,7 +220,7 @@ mod tests {
     let mut test_vm = VM::new();
     test_vm.registers[0] = 2;
     test_vm.registers[1] = 3;
-    test_vm.program = vec![Opcode::MUL as u8, 0, 1, 2]; // Remember, this is how we represent 500 using two u8s in little endian format
+    test_vm.program = vec![Opcode::MUL as u8, 0, 1, 2];
     test_vm.run_once();
     assert_eq!(test_vm.registers[2], 6);
   }
@@ -230,7 +230,7 @@ mod tests {
     let mut test_vm = VM::new();
     test_vm.registers[0] = 7;
     test_vm.registers[1] = 3;
-    test_vm.program = vec![Opcode::DIV as u8, 0, 1, 2]; // Remember, this is how we represent 500 using two u8s in little endian format
+    test_vm.program = vec![Opcode::DIV as u8, 0, 1, 2];
     test_vm.run_once();
     assert_eq!(test_vm.registers[2], 2);
     assert_eq!(test_vm.remainder, 1);

@@ -66,7 +66,7 @@ impl From<u8> for Opcode {
 
 
 
-  #[cfg(test)]
+#[cfg(test)]
 mod tests {
   use super::*;
 
