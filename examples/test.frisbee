@@ -1,0 +1,30 @@
+passive Temp {
+    Int x;
+}
+
+active SomeActor {
+    Int a;
+    Temp t;
+
+    def Void set_a(Int new_a) {
+        this.a = new_a;
+        this.t.x = new_a;
+    }
+    
+    def Void print_a() {
+        io ! print(this.a);
+    }
+    
+    def Void print_t_plus(Int z) {
+        io ! print(this.t.x + z);
+    }
+}
+
+active Main {
+    def Void run() {
+        SomeActor ac = spawn SomeActor();
+        ac ! set_a(1);
+        ac ! print_a();
+        ac ! print_t_plus(2);
+    }
+}

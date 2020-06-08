@@ -1,5 +1,6 @@
 module Lib
-    ( printTree
+    ( printTree,
+      printAsm
     ) where
 
 import Frisbee
@@ -9,10 +10,15 @@ import Text.Pretty.Simple (pPrint, pPrintNoColor)
 
 parseText = frisbee . alexScanTokens2
 
-printTree :: IO ()
-printTree = do
-    inStr <- getContents
+printTree :: String -> IO ()
+printTree inStr = do
     -- pPrintNoColor $ alexScanTokens2 inStr
     pPrintNoColor $ parseText inStr
+
+
+printAsm:: String -> IO()
+printAsm s = do
+    let x = parseText s
+    print "Some day here will be ASM!"
 
 

@@ -1,5 +1,5 @@
 extern crate nom;
-use crate::assembler::{AssemblerInstruction};
+use crate::assembler::{AssemblerInstruction, Operand};
 use crate::parser_core::{register, int_value};
 use crate::instruction::Opcode;
 
