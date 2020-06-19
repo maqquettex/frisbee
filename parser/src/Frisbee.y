@@ -55,83 +55,83 @@ import Tokens
 %%
 
 Program : 
-        ImportDeclList ObjectDeclList { Program $1 $2 }
+    ImportDeclList ObjectDeclList { Program $1 $2 }
 
 
 ImportDeclList :
-        "from" ident "import" ImportIdentList ";" ImportDeclList { ImportDeclList $2 $4 $6 }
-        |                                                  { ImportDeclListEmpty }
-
+    "from" ident "import" ImportIdentList ";" ImportDeclList { ImportDeclList $2 $4 $6 }
+    |                                                        { ImportDeclListEmpty }
 
 ImportIdentList :
-        typeident "," ImportIdentList { ImportIdentList $1 $3 }
-        | typeident               { ImportIdentList $1 ImportIdentListEmpty }
+      typeident "," ImportIdentList { ImportIdentList $1 $3 }
+    | typeident                   { ImportIdentList $1 ImportIdentListEmpty }
 
 
 ObjectDeclList :
-          ObjectDecl     { ObjectDeclList $1 OEmpty }
-          | ObjectDecl ObjectDeclList { ObjectDeclList $1 $2 }
-          |             { OEmpty }
+    ObjectDecl                  { ObjectDeclList $1 OEmpty }
+    | ObjectDecl ObjectDeclList { ObjectDeclList $1 $2 }
+    |                           { OEmpty }
 
 ObjectDecl : 
-            "active" typeident "{" VarDeclList MethodDeclList "}"    { ActiveDecl  $2 $4 $5 }
-          | "passive" typeident "{" VarDeclList MethodDeclList "}"   { PassiveDecl $2 $4 $5 }
+      "active"  typeident "{" VarDeclList MethodDeclList "}"   { ActiveDecl  $2 $4 $5 }
+    | "passive" typeident "{" VarDeclList MethodDeclList "}"   { PassiveDecl $2 $4 $5 }
 
 
 MethodDeclList :
-     MethodDecl                   { MethodDeclList $1 MEmpty }
-     | MethodDecl MethodDeclList  { MethodDeclList $1 $2 }
-     |                            { MEmpty }
+    MethodDecl                   { MethodDeclList $1 MEmpty }
+    | MethodDecl MethodDeclList  { MethodDeclList $1 $2 }
+    |                            { MEmpty }
 
 MethodDecl : 
-       "def" Type ident "(" FormalList ")" "{" StatementList "}" { MethodDecl $2 $3 $5 $8 }
+    "def" Type ident "(" FormalList ")" "{" StatementList "}" { MethodDecl $2 $3 $5 $8 }
 
 VarDeclList :
-     Type ident ";" { VarDeclList $1 $2 VEmpty }
-     | Type ident ";" VarDeclList { VarDeclList $1 $2 $4 }
-     |              { VEmpty }
+      Type ident ";"             { VarDeclList $1 $2 VEmpty }
+    | Type ident ";" VarDeclList { VarDeclList $1 $2 $4 }
+    |                            { VEmpty }
 
 FormalList :
-     Type ident       { FormalList $1 $2 FEmpty }
-     | Type ident "," FormalList { FormalList $1 $2 $4 }
-     |                  { FEmpty }
+      Type ident                { FormalList $1 $2 FEmpty }
+    | Type ident "," FormalList { FormalList $1 $2 $4 }
+    |                           { FEmpty }
 
 Type :
-     "val"       { TypeAnonymous }
-     | CertainType { $1 }
+    "val"         { TypeAnonymous }
+    | CertainType { $1 }
 
 CertainType :
-     CertainType "?"    { TypeMaybe $1 }
-     | "[" CertainType "]"    { TypeArray $2 }
-     | "Void"       { TypeVoid }
-     | "Int"    { TypeInt }
-     | "String"    { TypeString }
-     | "Bool"    { TypeBool }
-     | typeident    { TypeIdent $1 }
+      CertainType "?"     { TypeMaybe $1 }
+    | "[" CertainType "]" { TypeArray $2 }
+    | "Void"              { TypeVoid }
+    | "Int"               { TypeInt }
+    | "String"            { TypeString }
+    | "Bool"              { TypeBool }
+    | typeident           { TypeIdent $1 }
     
 
 Statement :
-    "{" StatementList "}"                            { SList $2 }
-    | "if" "(" Exp ")" Statement "else" Statement  { SIfElse $3 $5 $7 }
-    | "if" "(" Exp ")" Statement                  { SIfElse $3 $5 (SList Empty) }
-    | "while" "(" Exp ")" Statement                { SWhile $3 $5 }
-    | "return" Exp ";"                              { SReturn $2 }
-    | ident "=" Exp ";"                              { SEqual $1 $3 }
-    | Type ident ";"                              { SVarDecl $1 $2 }
-    | Type ident "=" Exp ";"                              { SVarDeclEqual $1 $2 $4 }
-    | Exp "." ident   "=" Exp ";"                              { SEqualField $1 $3 $5 }
-    | Exp "!" ident "(" ExpList ")" ";"   { SSendMessage $1 $3 $5}
-    | ident "<=" Exp "!" ident "(" ExpList ")" ";"   { SWaitMessage $1 $3 $5 $7 }
-    | Type ident "<=" Exp "!" ident "(" ExpList ")" ";"   { SList (StatementList
+    "{" StatementList "}"                                { SList $2 }
+    | "if" "(" Exp ")" Statement "else" Statement        { SIfElse $3 $5 $7 }
+    | "if" "(" Exp ")" Statement                         { SIfElse $3 $5 (SList Empty) }
+    | "while" "(" Exp ")" Statement                      { SWhile $3 $5 }
+    | "return" Exp ";"                                   { SReturn $2 }
+    | ident "=" Exp ";"                                  { SEqual $1 $3 }
+    | Type ident ";"                                     { SVarDecl $1 $2 }
+    | Type ident "=" Exp ";"                             { SVarDeclEqual $1 $2 $4 }
+    | Exp "." ident   "=" Exp ";"                        { SEqualField $1 $3 $5 }
+    | Exp "!" ident "(" ExpList ")" ";"                  { SSendMessage $1 $3 $5}
+    | ident "<=" Exp "!" ident "(" ExpList ")" ";"       { SWaitMessage $1 $3 $5 $7 }
+    | Type ident "<=" Exp "!" ident "(" ExpList ")" ";"  { SList (StatementList
                                                                      (StatementList
                                                                         Empty
                                                                         (SWaitMessage $2 $4 $6 $8))
                                                                      (SVarDecl $1 $2)) }
-    | ident "[" Exp "]" "=" Exp ";"                  { SArrayEqual $1 $3 $6 }
-    | Exp   ";"                    { SExp $1}
+    | ident "[" Exp "]" "=" Exp ";"                      { SArrayEqual $1 $3 $6 }
+    | Exp   ";"                                          { SExp $1}
+
 
 StatementList :
-    Statement               { StatementList Empty $1 }
+      Statement                 { StatementList Empty $1 }
     | StatementList Statement   { StatementList $1 $2 }
 
 Exp : 
@@ -172,7 +172,7 @@ parseError tokenList =
 -- PYTHON START HERE
 
 data Program = Program ImportDeclList ObjectDeclList  -- imports, objects
-      deriving (Show, Eq)
+    deriving (Show, Eq)
 
 
 data ImportDeclList
@@ -184,12 +184,12 @@ data ImportDeclList
 data ObjectDeclList
     = ObjectDeclList ObjectDecl ObjectDeclList  -- head, tail
     | OEmpty -- 
-  deriving (Show, Eq)
+     deriving (Show, Eq)
 
 data ObjectDecl
     = ActiveDecl  String VarDeclList MethodDeclList  -- name, vars, methods
     | PassiveDecl String VarDeclList MethodDeclList  -- name, vars, methods
-  deriving (Show, Eq)
+     deriving (Show, Eq)
 
 
 data MethodDeclList
@@ -210,7 +210,7 @@ data VarDeclList =
 data FormalList = 
     FormalList Type String FormalList  -- typename, name, tail
     | FEmpty  --
-  deriving (Show, Eq)
+    deriving (Show, Eq)
 
 data Type =
       TypeAnonymous  -- 
