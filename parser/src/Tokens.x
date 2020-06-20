@@ -170,23 +170,19 @@ tokenPosn (TStringLiteral p str) = p
 tokenPosn (TReturn p) = p                    
 
 
-getLineNum :: AlexPosn -> Int
-getLineNum (AlexPn offset lineNum colNum) = lineNum 
+alexGetLineNum :: AlexPosn -> Int
+alexGetLineNum (AlexPn offset lineNum colNum) = lineNum 
 
-getColumnNum :: AlexPosn -> Int
-getColumnNum (AlexPn offset lineNum colNum) = colNum
+
 
 alexScanTokensCustom :: String -> Either String [Token]
 alexScanTokensCustom str = go (alexStartPos,'\n',[], str)
-  where go (pos,x, [], str) =
-          case alexScan (pos, x, [], str) 0 of
+  where go inp@(pos, x, [], str) =
+          case alexScan inp 0 of
                 AlexEOF -> Right []
-                AlexError _ -> Left ("lexical error @ line " ++ show (getLineNum(pos)))
+                AlexError ((AlexPn _ line _),_,_,_) -> Left ("Line " ++ show line ++ ": lexical error")
                 AlexSkip  inp' len     -> go inp'
-                AlexToken inp' len act -> 
-                    case (go inp') of
-                        Right rest -> Right (act pos (take len str) : rest)
-                        Left err -> Left err
-
+                AlexToken inp' len act ->
+                    (go inp') >>= (\r -> Right $ (act pos (take len str)) : r)
 
 }
