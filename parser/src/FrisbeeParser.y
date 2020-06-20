@@ -160,7 +160,7 @@ ExpList :
 {
 
 parseError []     = Left "Wrong program structure"
-parseError (hd:_) = Left ("Parse error at line " ++ show(alexGetLineNum(tokenPosn hd))) 
+parseError (hd:_) = Left $ "Parse error at line " ++ show(alexGetLineNum hd)
 
 
 data Program = Program [ImportDecl] [ObjectDecl]
