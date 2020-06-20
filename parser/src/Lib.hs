@@ -1,14 +1,21 @@
 module Lib
-    ( printTree,
+    ( parseText,
+      printTree,
       printAsm
     ) where
 
-import Frisbee
+import FrisbeeParser
 import Tokens
 
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 
-parseText = frisbee . alexScanTokens2
+parseText :: String -> Either String Program
+parseText s = case alexScanTokensCustom s of 
+    Right tokens -> 
+        case astparser tokens of
+            Right prog -> Right prog
+            Left err -> Left err
+    Left err -> Left err
 
 printTree :: String -> IO ()
 printTree inStr = do

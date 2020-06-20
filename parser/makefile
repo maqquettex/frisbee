@@ -1,4 +1,9 @@
-all: build exe
+.PHONY: test fast exe
+
+all: fast exe
+
+test:
+	stack test --fast
 
 build: fast
 

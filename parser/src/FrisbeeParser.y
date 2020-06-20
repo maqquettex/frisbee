@@ -1,12 +1,15 @@
 {
-module Frisbee where
+module FrisbeeParser where
 import Tokens
 }
 
 
-%name frisbee
+%name astparser
 %tokentype { Token }
+%monad { E } { thenE } { returnE }
 %error { parseError }
+
+
 %token
     "active"          { TActive _ }
     "passive"         { TPassive _ }
@@ -156,10 +159,33 @@ ExpList :
 
 
 {
-parseError :: [Token] -> a
-parseError tokenList =
-  let pos = tokenPosn $ head tokenList
-  in error ("parse error at line " ++ show(getLineNum(pos)) ++ " and column " ++ show(getColumnNum(pos)))
+
+type E a = Either String a
+
+thenE :: E a -> (a -> E b) -> E b
+m `thenE` k = 
+    case m of 
+        Right a -> k a
+        Left e -> Left e
+
+returnE :: a -> E a
+returnE a = Right a
+
+failE :: String -> E a
+failE err = Left err
+
+catchE :: E a -> (String -> E a) -> E a
+catchE m k = 
+    case m of
+        Right a -> Right a
+        Left e -> k e
+
+
+parseError ([]) = failE "Wrong program structure"
+parseError (hd : _) = 
+    let pos = tokenPosn hd
+    in failE ("Parse error at line " ++ show(getLineNum(pos))) 
+
 
 
 data Program = Program [ImportDecl] [ObjectDecl]

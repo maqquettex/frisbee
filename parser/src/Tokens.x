@@ -176,18 +176,17 @@ getLineNum (AlexPn offset lineNum colNum) = lineNum
 getColumnNum :: AlexPosn -> Int
 getColumnNum (AlexPn offset lineNum colNum) = colNum
 
-alexScanTokens :: String -> [Token]
-alexScanTokens2 str = filter notcomment $ go (alexStartPos,'\n',[], str)
+alexScanTokensCustom :: String -> Either String [Token]
+alexScanTokensCustom str = go (alexStartPos,'\n',[], str)
   where go (pos,x, [], str) =
           case alexScan (pos, x, [], str) 0 of
-                AlexEOF -> []
-                AlexError _ -> error ("lexical error @ line " ++ show (getLineNum(pos)) ++ " and column " ++ show (getColumnNum(pos)))
+                AlexEOF -> Right []
+                AlexError _ -> Left ("lexical error @ line " ++ show (getLineNum(pos)))
                 AlexSkip  inp' len     -> go inp'
-                AlexToken inp' len act -> act pos (take len str) : go inp'
-        notcomment tok =
-                case tok of
-                        TComment _ _ -> False
-                        _ -> True
+                AlexToken inp' len act -> 
+                    case (go inp') of
+                        Right rest -> Right (act pos (take len str) : rest)
+                        Left err -> Left err
 
 
 }
