@@ -10,12 +10,7 @@ import Tokens
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 
 parseText :: String -> Either String Program
-parseText s = case alexScanTokensCustom s of 
-    Right tokens -> 
-        case astparser tokens of
-            Right prog -> Right prog
-            Left err -> Left err
-    Left err -> Left err
+parseText s = alexScanTokensCustom s >>= astparser 
 
 printTree :: String -> IO ()
 printTree inStr = do
