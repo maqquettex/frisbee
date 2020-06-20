@@ -1,6 +1,7 @@
 .PHONY: test fast exe
 
 all: fast exe
+asm: fast exe-asm
 
 test:
 	stack test --fast
@@ -12,6 +13,9 @@ fast:
 
 exe:
 	stack exec frisbee-exe
+
+exe-asm:
+	stack exec frisbee-exe asm
 
 alex:
 	rm -f src/Tokens.hs
