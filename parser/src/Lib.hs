@@ -23,6 +23,7 @@ printTree :: String -> IO ()
 printTree (parseText -> Right prog) = pPrintNoColor prog
 printTree (parseText -> Left err)   = print err
 
+-- Switch between ASM and preprocessed program
 
 -- printAsm:: String -> IO()
 -- printAsm (parseTextAndGen -> Right strs) = pPrintNoColor strs
